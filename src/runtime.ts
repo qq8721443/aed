@@ -4,7 +4,13 @@ export class Runtime {
   private definitionMap: Record<
     string,
     {
-      resolve?: ({ events, page, session, journey, entities }: {
+      resolve?: ({
+        events,
+        page,
+        session,
+        journey,
+        entities,
+      }: {
         events?: unknown;
         page?: Record<string, unknown>;
         session?: Record<string, unknown>;
@@ -35,9 +41,24 @@ export class Runtime {
   // emit과 inspect는 동작은 같지만 production 용인지 development 용인지에 따라 나뉨
   emit(name: string, params?: unknown) {
     // definitionMap[name]이 없을 경우 에러를 반환하도록 의도함
-    this.definitionMap[name].dispatch?.(this.definitionMap[name]?.resolve?.({
-      events: params,
-    }));
+    this.definitionMap[name].dispatch?.(
+      this.definitionMap[name]?.resolve?.({
+        events: params,
+        page: this.store.page.data,
+        session: this.store.session.data,
+        journey: this.store.journey.data,
+        entities: this.store.entities.data,
+      }),
+    );
   }
-  inspect(name: string, params?: unknown) {}
+  inspect(name: string, params?: unknown) {
+    // definitionMap[name]이 없을 경우 에러를 반환하도록 의도함
+    this.definitionMap[name].resolve?.({
+      events: params,
+      page: this.store.page.data,
+      session: this.store.session.data,
+      journey: this.store.journey.data,
+      entities: this.store.entities.data,
+    });
+  }
 }

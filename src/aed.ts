@@ -1,21 +1,24 @@
 import { Runtime } from "./runtime";
 import { Store } from "./store";
 
-export class AED<TEvents extends AEDEventMap> {
+export class AED<
+  TEvents extends AEDEventMap,
+  TDefinition extends AEDEventDefinition["dispatch"],
+> {
   // store 생성
-  private readonly store = new Store();
+  readonly store = new Store();
   // aed runtime 생성
   private readonly runtime = new Runtime(this.store);
 
-  constructor(events: TEvents) {
-    this.defineEvents(events)
+  constructor(events: TEvents, globalDispatch: TDefinition) {
+    this.defineEvents(events, globalDispatch);
   }
 
-  defineEvents(events: TEvents) {
+  defineEvents(events: TEvents, globalDispatch: TDefinition) {
     for (const [name, definition] of Object.entries(events)) {
       this.runtime.define(name, {
         resolve: definition.resolve,
-        dispatch: definition.dispatch,
+        dispatch: definition.dispatch || globalDispatch,
       });
     }
   }
@@ -27,7 +30,16 @@ export class AED<TEvents extends AEDEventMap> {
   }
 }
 
-export const createAED = <TEvents extends AEDEventMap = AEDEventMap>(events: TEvents) => {
-  const aed = new AED(events);
+export const createAED = <
+  TEvents extends AEDEventMap,
+  TDefinition extends AEDEventDefinition["dispatch"],
+>({
+  events,
+  globalDispatch,
+}: {
+  events: TEvents;
+  globalDispatch?: TDefinition;
+}) => {
+  const aed = new AED(events, globalDispatch);
   return aed;
 };

@@ -7,13 +7,18 @@ type AEDEventDefinition = {
     entities?: Record<string, Record<string, unknown>>;
   }) => Record<string, unknown>;
   dispatch?: (events?: Record<string, unknown>) => void | Promise<void>;
-}
+};
 
 type AEDParameter = {
   events: AEDEventMap;
   dispatch?: (events?: Record<string, unknown>) => void | Promise<void>;
-}
+};
 
 type AEDEventMap = {
   [eventName: string]: AEDEventDefinition;
-}
+};
+
+type AEDDefinition = {
+  events: AEDEventMap;
+  globalDispatch?: AEDEventDefinition["dispatch"];
+};
