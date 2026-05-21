@@ -3,15 +3,44 @@ import { createAED } from "./aed";
 
 test("page store에 저장하면 resolve 함수에 저장한 값이 인자로 전달된다.", () => {
   const dispatch = vi.fn();
-  const aed = createAED({
+  const aed = createAED<{
+    page: {
+      home: {
+        name: "home";
+        utm_source: "test";
+      };
+    };
+    session: {
+      anonymous: {
+        "anonymous-id": "1234";
+      };
+    };
+    journey: {
+      user: {
+        "user-id": "12321";
+      };
+    };
+    entities: {
+      project: {
+        "123": {
+          projectId: "123";
+          name: "프로젝트 이름";
+          rating: 3.4;
+          author: {
+            id: "user";
+            name: "user1";
+          };
+        };
+      };
+    };
+  }>()({
     events: {
       "test-event": {
         resolve: ({ page, session, journey, entities }) => {
           return {
             ...page,
             session,
-            // TODO: 실제 사용할 때 unknown 때문에 any 타입 단언이 필요함.
-            userId: (journey?.user as any)["user-id"],
+            userId: journey?.user["user-id"],
             entities,
           };
         },

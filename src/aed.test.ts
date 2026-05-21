@@ -9,6 +9,31 @@ test("createAED 메서드는 AED 인스턴스를 반환한다.", () => {
   expect(aed).toBeInstanceOf(AED);
 });
 
+test("createAED 메서드의 제네릭을 사용해 Store의 타입을 지정할 수 있다.", () => {
+  const dispatch = vi.fn();
+
+  const aed = createAED<{ page: { page1: "test" } }>()({
+    events: {
+      event1: {
+        resolve: ({ page }) => {
+          return {
+            test: page.page1,
+          };
+        },
+        dispatch,
+      },
+    },
+  });
+
+  aed.store.page.set("page1", "test");
+
+  aed.emit("event1");
+
+  expect(dispatch).toHaveBeenCalledWith({
+    test: "test",
+  });
+});
+
 test("createAED에 정의한 event를 emit하면 resolve 결과를 dispatch에 전달한다.", () => {
   const dispatch = vi.fn();
 
